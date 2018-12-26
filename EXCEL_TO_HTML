@@ -1,0 +1,213 @@
+CODE FOR EXCEL TO HTML
+package customerapplication
+//import java.lang.*;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook
+import org.apache.poi.ss.usermodel.Workbook
+import org.apache.poi.ss.usermodel.Sheet
+import com.google.common.collect.ArrayTable.Row
+import org.h2.result.Row
+import javax.swing.DefaultRowSorter.Row
+import org.hsqldb.Row
+import com.sun.rowset.internal.Row
+import javax.swing.text.ParagraphView.Row
+import com.google.common.collect.StandardTable.Row
+import org.apache.poi.ss.usermodel.Row
+import com.google.common.collect.Table.Cell
+import org.apache.poi.ss.usermodel.Cell
+import org.apache.poi.hssf.usermodel.HSSFSheet
+import org.apache.poi.hssf.usermodel.HSSFCell
+import org.springframework.web.multipart.MultipartFile
+import org.springframework.web.multipart.MultipartHttpServletRequest
+import com.lowagie.text.Font
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.hssf.usermodel.HSSFRichTextString;
+import com.lowagie.text.pdf.CFFFont.Font
+import java.io.InputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.awt.Font
+import org.apache.poi.hssf.usermodel.HSSFCellStyle
+import org.apache.poi.ss.usermodel.Font
+import  org.apache.poi.hssf.util.HSSFColor
+import org.apache.poi.hssf.usermodel.HSSFFont
+import org.apache.poi.hssf.usermodel.HSSFPalette
+class CountryController {
+    def index() {
+        String a="",styles="",value="",dummy="",newLine="",table="<table border=1>"
+        int flag=1,temp=0
+        Short[] rgb = new Short[3];
+        Short[] rgb1 = new Short[3];
+        Font font1=null
+        HSSFFont font =null
+        HSSFColor color =null,color1=null
+        InputStream inputStream = new FileInputStream("pages.xls")
+        Workbook workbook = new HSSFWorkbook(inputStream)
+        HSSFSheet sheet = workbook.getSheetAt(0)
+        for(Row row:sheet) {
+            value=""
+            table=table+"<tr>"
+          for(Cell cell:row) {
+          
+                flag=1
+                value=""
+        HSSFRichTextString richString = cell.getRichStringCellValue()
+        HSSFCellStyle cs=cell.getCellStyle() 
+        HSSFPalette paletteIns = ((HSSFWorkbook)workbook).getCustomPalette()
+        HSSFColor bg = cs.getFillForegroundColorColor()
+            Short[] rs = bg.getTriplet()
+            rgb1[0] = rs[0]
+            rgb1[1] = rs[1]
+            rgb1[2] = rs[2]
+            print "${rgb1[0]},${rgb1[1]},${rgb1[2]}"
+            if(rgb1[0]==0 && rgb1[1]==0 && rgb1[2]==0)
+            {
+            rgb1[0] = 255
+            rgb1[1] = 255
+            rgb1[2] = 255
+            }
+            table=table+"<td style=\"background-color:rgb("+rgb1[0]+","+rgb1[1]+","+rgb1[2]+");\">"
+        if(richString.length()== 0)
+        flag=0
+        String string = richString.toString()
+        for(int i=0;i<richString.length();i++) {
+            newLine=""
+            
+        if(richString.getFontAtIndex(i)==0){
+            font = workbook.getFontAt(cs.getFontIndex());
+            font1 = workbook.getFontAt(cs.getFontIndex());     
+        }else{
+            font = workbook.getFontAt(richString.getFontAtIndex(i))
+            if(i<richString.length()-1) {
+                font1 = workbook.getFontAt(richString.getFontAtIndex(i+1))
+            } else {
+                font1 = workbook.getFontAt(richString.getFontAtIndex(i))
+            }
+      }
+        if(!(string.charAt(i).toString().equals(" "))){
+            color = paletteIns.getColor(font.getColor())
+            color1 = paletteIns.getColor(font1.getColor())
+             Short[] r = color?.getTriplet()
+               
+//            if(color1==null && color==null) { 
+//                    String fontName = font.getFontName()
+//                    Short fontHeight = font.getFontHeightInPoints()
+//                    Short bw = font.getBoldweight()
+//                    Boolean it = font.getItalic()
+//                    Boolean u = font.getUnderline()
+//                    font = workbook.createFont()
+//                    font.setFontName(fontName)
+//                    font.setFontHeightInPoints((short) fontHeight)
+//                    if(bw==700) {
+//                       font.setBoldweight ( Font.BOLDWEIGHT_BOLD );
+//                    } 
+//                    if(it) {
+//                        font.setItalic(true)
+//                    }
+//                    if(u) {
+//                        font.setUnderline(Font.U_SINGLE)
+//                    }
+//                    font.setColor(HSSFColor.BLACK.index);
+//                    cs.setFont(font);
+//                    font1 = workbook.createFont();
+//                    font1.setFontName(HSSFFont.FONT_ARIAL);
+//                    font1.setFontHeightInPoints((short) 10);
+//                    font1.setColor(HSSFColor.BLACK.index);
+//                    font = workbook.getFontAt(cs.getFontIndex())
+//                    font1 = workbook.getFontAt(cs.getFontIndex())
+//                    color = paletteIns.getColor(font.getColor())
+//                    color1 = paletteIns.getColor(font1.getColor())
+//                   
+//                    } 
+           if((!color)&&(!color1))
+           {
+               rgb[0] = 0
+               rgb[1] = 0
+               rgb[2] = 0
+           }
+        else{
+            rgb[0] = r[0]
+            rgb[1] = r[1]
+            rgb[2] = r[2]
+        }
+            if( (font.getItalic()) && (font.getUnderline()) && 
+                            (font.getBoldweight()==700)) {
+                            dummy="<i><u><b>"+string.charAt(i).toString()+"</b></i></u>"
+                        } else if( (font.getItalic()) && (font.getBoldweight()==700) ) {
+                            dummy="<i><b>"+string.charAt(i).toString()+"</b></i>"
+                        } else if( (font.getBoldweight()==700) && (font.getUnderline() ) ){
+                            dummy="<b><u>"+string.charAt(i).toString()+"</u></b>"
+                        } else if(font.getItalic() && (font.getUnderline() )) {
+                            dummy="<u><i>"+string.charAt(i).toString()+"</i></u>"
+                        } else if(font.getItalic()) {
+                            dummy="<i>"+string.charAt(i).toString()+"</i>"
+                        } else if(font.getUnderline()) {
+                            dummy="<u>"+string.charAt(i).toString()+"</u>"
+                        } else if(font.getBoldweight()==700) {
+                            dummy="<b>"+string.charAt(i).toString()+"</b>"
+                        } else {
+                dummy=string.charAt(i).toString()
+           } 
+            if(string.charAt(i).toString().equals("\n")) {
+               newLine="<br>"
+          }
+
+            if( (color && color1)&&(font.getFontName().equals(font1.getFontName())) 
+                &&(font.getFontHeightInPoints().equals(font1.getFontHeightInPoints()))
+//                &&(Arrays.equals(color.getTriplet(),color1.getTriplet()))
+                && (!(string.charAt(i).toString().equals("\n"))) ) {
+                temp=1
+                value=value+dummy
+            }else {
+                styles=table+"<span style=\"font-family:"+font.getFontName()+";font-size:"+font.getFontHeightInPoints()+"px;color:rgb("+rgb[0]+","+rgb[1]+","+rgb[2]+");\">"+value+""+dummy+""+"</span>"+newLine
+                 table=""
+                 a=a+styles
+                 value=""
+                 flag=1 
+               
+            }
+        }else {
+            value=value+" "
+        }
+    }
+    if(flag==1) {
+        styles=table+"<span style=\"font-family:"+font.getFontName()+";font-size:"+font.getFontHeightInPoints()+"px;color:rgb("+rgb[0]+","+rgb[1]+","+rgb[2]+");\">"+value+""+"</span>"+newLine 
+        a=a+styles
+        table=""
+    }
+    a=a+"</td>"
+  }
+   a=a+"</tr>"
+   table=""
+ }
+ a=a+"</table>"
+    println "a ${a}"    
+    render view:"index", model:[str:a]
+}
+     def import_image()
+    {
+        String aa;
+        List<String> list=new ArrayList();
+        String base64String;
+        InputStream input=new FileInputStream("picture.xls");
+        HSSFWorkbook excelBook=new HSSFWorkbook(input);
+        List lst = excelBook.getAllPictures();
+
+        for (Iterator it = lst.iterator(); it.hasNext(); ) 
+        {
+            PictureData pict = (PictureData)it.next();
+            String ext = pict.suggestFileExtension();
+
+            byte[] data = pict.getData()
+
+            base64String = Base64.encodeBase64String(data);
+            // aa = Base64.encodeBase64URLSafeString(data);
+            //base64String = Base64.encodeBase64URLSafeString(data)
+        aa = "data:image/jpeg;base64," + base64String;
+        list.add(aa);
+      
+    }
+    [picture:list]  
+
+}
+
+}
