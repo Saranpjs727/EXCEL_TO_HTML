@@ -1,10 +1,12 @@
+// In Excel to HTML conversion we can pass the list of data to HTML only in the form of string (append each data and apply style using <span> 
+//In HTML---> we can get those string using [${raw(str)}]
 def index() {
        String a="",styles="",value="",dummy="",newLine="",table="<table border='1px'>"
         int flag=1
         Short[] rgb = new Short[3]
+        Short[] rgb1 = new Short[3];
         HSSFFont font1=null
         HSSFFont font =null 
-                Short[] rgb1 = new Short[3];
         InputStream inputStream = new FileInputStream("imports.xls")
         Workbook workbook = new HSSFWorkbook(inputStream)
         HSSFSheet sheet = workbook.getSheetAt(0)
@@ -12,26 +14,24 @@ def index() {
             value=""
             table = table+"<tr>"
             for(Cell cell:row) {
-              //  table=table+"<td>"
                 flag=1
                 value=""
-                if(cell.cellType==HSSFCell.CELL_TYPE_NUMERIC){
-                    print "numeric"
+                if(cell.cellType==HSSFCell.CELL_TYPE_NUMERIC){            //if the data is in numeric form convert it into string 
                         cell.setCellType(Cell.CELL_TYPE_STRING)
                  }
                 
-                HSSFRichTextString richString = cell.getRichStringCellValue()
+                HSSFRichTextString richString = cell.getRichStringCellValue()         //if the string consist of different fonts,size,bold,italic or color we get that string using this method.It gets string with its applied features 
                 println "richString ${richString}"
                 String string = richString.toString()
-                HSSFCellStyle cs = cell.getCellStyle()
+                HSSFCellStyle cs = cell.getCellStyle()   // if the string consist of non of the styles we get the string using this method
               
- HSSFColor bg = cs.getFillForegroundColorColor()
+ HSSFColor bg = cs.getFillForegroundColorColor() // for fetching bg color
             Short[] rs = bg.getTriplet()
             rgb1[0] = rs[0]
             rgb1[1] = rs[1]
             rgb1[2] = rs[2]
-            print "${rgb1[0]},${rgb1[1]},${rgb1[2]}"
-            if(rgb1[0]==0 && rgb1[1]==0 && rgb1[2]==0)
+           
+            if(rgb1[0]==0 && rgb1[1]==0 && rgb1[2]==0)  // if non of the color is applied in cell it takes each cell color as black(0).So set the color as white(255)
             {
             rgb1[0] = 255
             rgb1[1] = 255
@@ -45,11 +45,9 @@ def index() {
                     newLine=""
                     if(richString.getFontAtIndex(i)==0) {
                         if(richString.getFontAtIndex(i)==0){
-                            print"font 0"
                             font = workbook.getFontAt(cs.getFontIndex());
                             font1 = workbook.getFontAt(cs.getFontIndex());     
                         }else{
-                            print "color"
                             font = workbook.getFontAt(richString.getFontAtIndex(i))
                             if(i<richString.length()-1) {
                                 font1 = workbook.getFontAt(richString.getFontAtIndex(i+1))
@@ -68,7 +66,6 @@ def index() {
                     
                     if(!(string.charAt(i).toString().equals(" "))){
                         HSSFPalette paletteIns = ((HSSFWorkbook)workbook).getCustomPalette()
-                       // println "paletteIns ${paletteIns}"
                         HSSFColor color = paletteIns.getColor(font.getColor())
                         HSSFColor color1 = paletteIns.getColor(font1.getColor())
                        
@@ -82,9 +79,7 @@ def index() {
                             rgb[1] = 0
                             rgb[2] = 0
                         }
-                       
-                        //println "HSSFColor() ${rgb[0]} ${rgb[1]} ${rgb[2]}"
-                      //  println "getBold----> ${font.getBold()}"
+                      
                         if( (font.getItalic()) && (font.getUnderline()) && 
                             (font.getBoldweight()==700)) {
                             dummy="<i><u><b>"+string.charAt(i).toString()+"</b></i></u>"
@@ -112,10 +107,10 @@ def index() {
                             &&(font.getFontHeightInPoints().equals(font1.getFontHeightInPoints()))
                             &&(Arrays.equals(color.getTriplet(),color1.getTriplet()))
                             && (!(string.charAt(i).toString().equals("\n"))) ) {
-                           // println "inside if cdn"
+                           
                             value=value+dummy
                         }else {
-                           // println "inside else"
+                          
                             styles=table+"<span style=\"font-family:"+font.getFontName()+";font-size:"+font.getFontHeightInPoints()+"px;color:rgb("+rgb[0]+","+rgb[1]+","+rgb[2]+");\">"+value+""+dummy+""+"</span>"+newLine
                             table=""
                             a=a+styles
@@ -128,7 +123,6 @@ def index() {
                 }
                 if(flag==1) {
                     styles=table+"<span style=\"font-family:"+font.getFontName()+";font-size:"+font.getFontHeightInPoints()+"px;color:rgb("+rgb[0]+","+rgb[1]+","+rgb[2]+");\">"+value+""+"</span>"+newLine
-                   // println "inside flag==0"
                     table=""
                     a=a+styles
                     flag=0;
@@ -139,7 +133,6 @@ def index() {
             table=""
         }
         a=a+"</table>"
-        //  println "a ${a}" 
            render view:"index", model:[str:a]
     }
 
